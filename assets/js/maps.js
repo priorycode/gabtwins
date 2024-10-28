@@ -34,12 +34,12 @@ function changeMap(location) {
 
 // Lista de imágenes de fondo
 const images = [
+    'assets/img/hero.jpg',
     'assets/img/exteriordoors/exteriordoor1.JPG',
     'assets/img/baseboard/base1.png',
     'assets/img/interiordoors/interiordoor1.png',
     'assets/img/stairs/stairs2.JPG',
     'assets/img/windowssill/windowssill.JPG',
-    'assets/img/hero.jpg',
 ];
 
 let currentIndex = 0;
