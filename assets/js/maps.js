@@ -1,3 +1,4 @@
+
 function changeMap(location) {
     const map = document.getElementById("map");
 
@@ -34,17 +35,21 @@ function changeMap(location) {
 
 // Lista de imágenes de fondo
 const images = [
-    'assets/img/hero.jpg',
-    'assets/img/exteriordoors/exteriordoor1.JPG',
-    'assets/img/baseboard/base1.png',
-    'assets/img/interiordoors/interiordoor1.png',
-    'assets/img/stairs/stairs2.JPG',
-    'assets/img/windowssill/windowssill.JPG',
+    'assets/img/crownmolding/crown1.webp',
+    'assets/img/exteriordoors/exteriordoor1.webp',
+    'assets/img/baseboard/base1.webp',
+    'assets/img/interiordoors/interiordoor1.webp',
+    'assets/img/stairs/stairs2.webp',
+    'assets/img/windowssill/windowssill.webp',
+
 ];
 
-let currentIndex = 0;
+let currentIndex = 1; // Comienza en 1 ya que la primera imagen ya está visible
 let activeImage = document.getElementById('image1');
 let inactiveImage = document.getElementById('image2');
+
+// Establecer la imagen inicial
+activeImage.src = images[0];
 
 function changeBackground() {
     // Cambia el `src` de la imagen inactiva a la siguiente en la lista
@@ -56,7 +61,7 @@ function changeBackground() {
     inactiveImage.classList.remove('inactive');
     inactiveImage.classList.add('active');
 
-    // Cambia las imágenes después de la transición
+    // Cambia las referencias de las imágenes después de la transición
     [activeImage, inactiveImage] = [inactiveImage, activeImage];
     currentIndex = (currentIndex + 1) % images.length;
 }
@@ -64,53 +69,66 @@ function changeBackground() {
 // Cambia la imagen cada 5 segundos
 setInterval(changeBackground, 5000);
 
-
 const services = [
     'Crown Molding',
     'Exterior Doors',
-    'Baseboard',
+    'Baseboard     ',
     'Interior Doors',
-    'Stairs',
-    'Windows Sill'
+    'Stairs        ',
+    'Windows Sill '
 ];
 
 let currentServiceIndex = 0;
-let currentCharIndex = 0;
 let isDeleting = false;
+let lastTimestamp = performance.now();
 
-function typeEffect() {
+function typeEffect(timestamp) {
     const serviceElement = document.querySelector('.service');
     const currentService = services[currentServiceIndex];
+    const typingSpeed = 100;  // Tiempo entre letras al escribir
+    const deletingSpeed = 50; // Tiempo entre letras al borrar
+    const pauseTime = 3500;   // Pausa después de escribir una palabra
 
-    if (!isDeleting) {
-        // Agregar letra por letra
-        serviceElement.textContent = currentService.slice(0, currentCharIndex + 1);
-        currentCharIndex++;
+    // Tiempo transcurrido desde el último cambio
+    const timeElapsed = timestamp - lastTimestamp;
 
-        // Si se completó la palabra, espera antes de borrar
-        if (currentCharIndex === currentService.length) {
+    if (!isDeleting && timeElapsed > typingSpeed) {
+        // Escribe letra por letra
+        const currentText = currentService.slice(0, serviceElement.textContent.length + 1);
+        serviceElement.textContent = currentText;
+
+        // Si la palabra completa está escrita, espera antes de borrar
+        if (currentText === currentService) {
             isDeleting = true;
-            setTimeout(typeEffect, 3200); // Espera 2 segundos antes de empezar a borrar
-            return;
+            lastTimestamp = timestamp + pauseTime; // Agrega una pausa antes de borrar
+        } else {
+            lastTimestamp = timestamp;
         }
-    } else {
-        // Borrar letra por letra
-        serviceElement.textContent = currentService.slice(0, currentCharIndex - 1);
-        currentCharIndex--;
+    } else if (isDeleting && timeElapsed > deletingSpeed) {
+        // Borra letra por letra
+        const currentText = currentService.slice(0, serviceElement.textContent.length - 1);
+        serviceElement.textContent = currentText;
 
-        // Si se terminó de borrar, pasa al siguiente servicio
-        if (currentCharIndex === 0) {
+        // Si la palabra está completamente borrada, pasa a la siguiente palabra
+        if (currentText === "") {
             isDeleting = false;
             currentServiceIndex = (currentServiceIndex + 1) % services.length;
+            lastTimestamp = timestamp;
+        } else {
+            lastTimestamp = timestamp;
         }
     }
 
-    // Ajusta la velocidad del efecto
-    const delay = isDeleting ? 50 : 100;
-    setTimeout(typeEffect, delay);
+    requestAnimationFrame(typeEffect);
 }
 
 // Inicia el efecto de tipeo
-typeEffect();
+requestAnimationFrame(typeEffect);
 
+document.addEventListener("DOMContentLoaded", function() {
+    const images = document.querySelectorAll("img");
 
+    images.forEach(img => {
+        img.addEventListener("contextmenu", event => event.preventDefault());
+    });
+});

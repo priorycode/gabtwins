@@ -1,17 +1,6 @@
-/**
-* Template Name: Day
-* Template URL: https://bootstrapmade.com/day-multipurpose-html-template-for-free/
-* Updated: Aug 07 2024 with Bootstrap v5.3.3
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
 
 (function() {
   "use strict";
-
-  /**
-   * Apply .scrolled class to the body as the page is scrolled down
-   */
   function toggleScrolled() {
     const selectBody = document.querySelector('body');
     const selectHeader = document.querySelector('#header');
@@ -108,7 +97,7 @@
   function initSwiper() {
     document.querySelectorAll(".init-swiper").forEach(function(swiperElement) {
       let config = JSON.parse(
-        swiperElement.querySelector(".swiper-config").innerHTML.trim()
+          swiperElement.querySelector(".swiper-config").innerHTML.trim()
       );
 
       if (swiperElement.classList.contains("swiper-tab")) {
@@ -125,7 +114,38 @@
    * Initiate glightbox
    */
   const glightbox = GLightbox({
-    selector: '.glightbox'
+    selector: '.glightbox',
+    onOpen: () => {
+      document.querySelectorAll('.gslide img').forEach(function(image) {
+        image.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+        });
+        image.addEventListener('dragstart', function(e) {
+          e.preventDefault();
+        });
+      });
+    }
+  });
+
+  /**
+   * Disable image download for gallery images
+   */
+  document.querySelectorAll('.glightbox img').forEach(function(image) {
+    image.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+    image.addEventListener('dragstart', function(e) {
+      e.preventDefault();
+    });
+  });
+
+  document.querySelectorAll('.glightbox').forEach(function(glightboxElement) {
+    glightboxElement.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+    glightboxElement.addEventListener('dragstart', function(e) {
+      e.preventDefault();
+    });
   });
 
   /**
@@ -200,7 +220,5 @@
   }
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
-
- 
 
 })();
