@@ -33,102 +33,85 @@ function changeMap(location) {
     map.src = locations[location];
 }
 
-// Lista de imágenes de fondo
 const images = [
     'assets/img/crownmolding/crown1.webp',
-    'assets/img/exteriordoors/exteriordoor1.webp',
+    'assets/img/exteriordoors/exteriordoor1_modi.webp',
     'assets/img/baseboard/base1.webp',
     'assets/img/interiordoors/interiordoor1.webp',
     'assets/img/stairs/stairs2.webp',
     'assets/img/windowssill/windowssill.webp',
-
 ];
 
-let currentIndex = 1; // Comienza en 1 ya que la primera imagen ya está visible
+const services = [
+    'Crown Molding',
+    'Exterior Doors',
+    'Baseboard',
+    'Interior Doors',
+    'Stairs',
+    'Windows Sill'
+];
+
+let currentIndex = 0;
+const transitionDuration = 1000;
+const displayTime = 5000;
+
 let activeImage = document.getElementById('image1');
 let inactiveImage = document.getElementById('image2');
+const serviceElement = document.querySelector('.service');
 
-// Establecer la imagen inicial
-activeImage.src = images[0];
+document.addEventListener("DOMContentLoaded", () => {
+    activeImage.src = images[currentIndex];
+    serviceElement.textContent = services[currentIndex];
+    serviceElement.style.opacity = 1;
 
-function changeBackground() {
-    // Cambia el `src` de la imagen inactiva a la siguiente en la lista
+    activeImage.style.transition = `opacity ${transitionDuration}ms ease-in-out`;
+    inactiveImage.style.transition = `opacity ${transitionDuration}ms ease-in-out`;
+    serviceElement.style.transition = `opacity ${transitionDuration}ms ease-in-out`;
+
+    currentIndex = (currentIndex + 1) % services.length;
+    setInterval(changeContent, displayTime);
+});
+
+function changeContent() {
     inactiveImage.src = images[currentIndex];
-
-    // Alterna la opacidad aplicando las clases `active` e `inactive`
     activeImage.classList.remove('active');
     activeImage.classList.add('inactive');
     inactiveImage.classList.remove('inactive');
     inactiveImage.classList.add('active');
 
-    // Cambia las referencias de las imágenes después de la transición
     [activeImage, inactiveImage] = [inactiveImage, activeImage];
-    currentIndex = (currentIndex + 1) % images.length;
+    serviceElement.style.opacity = 0;
+
+    setTimeout(() => {
+        serviceElement.textContent = services[currentIndex];
+        serviceElement.style.opacity = 1;
+        currentIndex = (currentIndex + 1) % services.length;
+    }, transitionDuration);
 }
 
-// Cambia la imagen cada 5 segundos
-setInterval(changeBackground, 5000);
+function preventImageDownload() {
+    // Deshabilita el menú contextual para toda la página (bloquea clic derecho y mantener presionado)
+    document.addEventListener('contextmenu', event => event.preventDefault());
 
-const services = [
-    'Crown Molding',
-    'Exterior Doors',
-    'Baseboard     ',
-    'Interior Doors',
-    'Stairs        ',
-    'Windows Sill '
-];
+    // Previene la acción de arrastrar en todas las imágenes
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('dragstart', event => event.preventDefault());
+    });
 
-let currentServiceIndex = 0;
-let isDeleting = false;
-let lastTimestamp = performance.now();
+    // Previene el toque prolongado (gesto común para guardar en iPhone)
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('touchstart', preventLongPress);
+    });
 
-function typeEffect(timestamp) {
-    const serviceElement = document.querySelector('.service');
-    const currentService = services[currentServiceIndex];
-    const typingSpeed = 100;  // Tiempo entre letras al escribir
-    const deletingSpeed = 50; // Tiempo entre letras al borrar
-    const pauseTime = 3500;   // Pausa después de escribir una palabra
-
-    // Tiempo transcurrido desde el último cambio
-    const timeElapsed = timestamp - lastTimestamp;
-
-    if (!isDeleting && timeElapsed > typingSpeed) {
-        // Escribe letra por letra
-        const currentText = currentService.slice(0, serviceElement.textContent.length + 1);
-        serviceElement.textContent = currentText;
-
-        // Si la palabra completa está escrita, espera antes de borrar
-        if (currentText === currentService) {
-            isDeleting = true;
-            lastTimestamp = timestamp + pauseTime; // Agrega una pausa antes de borrar
-        } else {
-            lastTimestamp = timestamp;
-        }
-    } else if (isDeleting && timeElapsed > deletingSpeed) {
-        // Borra letra por letra
-        const currentText = currentService.slice(0, serviceElement.textContent.length - 1);
-        serviceElement.textContent = currentText;
-
-        // Si la palabra está completamente borrada, pasa a la siguiente palabra
-        if (currentText === "") {
-            isDeleting = false;
-            currentServiceIndex = (currentServiceIndex + 1) % services.length;
-            lastTimestamp = timestamp;
-        } else {
-            lastTimestamp = timestamp;
-        }
+    function preventLongPress(event) {
+        event.preventDefault(); // Bloquea el evento de mantener presionado
     }
 
-    requestAnimationFrame(typeEffect);
+    // Previene la función de guardar imagen desde el portapapeles
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('copy', event => event.preventDefault());
+    });
 }
 
-// Inicia el efecto de tipeo
-requestAnimationFrame(typeEffect);
-
-document.addEventListener("DOMContentLoaded", function() {
-    const images = document.querySelectorAll("img");
-
-    images.forEach(img => {
-        img.addEventListener("contextmenu", event => event.preventDefault());
-    });
-});
+// Ejecuta la función al cargar la página
+document.addEventListener("DOMContentLoaded", preventImageDownload);
